@@ -8,4 +8,5 @@ Simple utilities to help recording PettingZoo environments in Colab/Jupyter.
 
 
 ```bash
-pip install -e .
+pip install git+https://github.com/shoaib6174/pettingzoo_colab_visualizer.git
+```
