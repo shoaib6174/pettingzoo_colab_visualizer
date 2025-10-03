@@ -31,11 +31,15 @@ from moviepy.editor import ImageSequenceClip, concatenate_videoclips
 
 
 def extract_episode_number(filename: str) -> int:
-    """Extract integer episode number from filename like 'ep_42.gif'."""
-    m = re.search(r"ep(\d+)", filename, flags=re.IGNORECASE)
-    if m:
-        return int(m.group(1))
-    return 0  # fallback if no number found
+    """
+    Extract episode number from filenames like:
+    'ep4.gif', 'ep_4.gif', 'episode_4.gif', 'ep-4.gif'.
+    Returns 0 if no number found.
+    """
+    m = re.search(r"ep[_\-]?(\d+)", filename, flags=re.IGNORECASE)
+    if not m:
+        m = re.search(r"episode[_\-]?(\d+)", filename, flags=re.IGNORECASE)
+    return int(m.group(1)) if m else 0
 
 
 def _safe_episode_number_from_filename(name: str) -> str:
@@ -160,7 +164,10 @@ def create_video_from_gifs(gif_folder: str = "recordings", output_file: str = "t
     # gif_files = sorted([p for p in gif_dir.iterdir() if p.suffix.lower() in ('.gif',)], key=lambda p: p.name)
     
     
+    # List GIF files
     gif_files = [p for p in gif_dir.iterdir() if p.suffix.lower() == ".gif"]
+
+    # Sort numerically by extracted episode number
     gif_files.sort(key=lambda p: extract_episode_number(p.name))
 
 
