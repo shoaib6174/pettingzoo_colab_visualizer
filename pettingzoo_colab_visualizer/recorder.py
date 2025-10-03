@@ -30,6 +30,12 @@ import cv2
 from moviepy.editor import ImageSequenceClip, concatenate_videoclips
 
 
+def extract_episode_number(filename: str) -> int:
+    """Extract integer episode number from filename like 'ep_42.gif'."""
+    m = re.search(r"ep(\d+)", filename, flags=re.IGNORECASE)
+    if m:
+        return int(m.group(1))
+    return 0  # fallback if no number found
 
 
 def _safe_episode_number_from_filename(name: str) -> str:
@@ -151,7 +157,13 @@ def create_video_from_gifs(gif_folder: str = "recordings", output_file: str = "t
         raise FileNotFoundError(f"gif_folder '{gif_folder}' does not exist")
 
 
-    gif_files = sorted([p for p in gif_dir.iterdir() if p.suffix.lower() in ('.gif',)], key=lambda p: p.name)
+    # gif_files = sorted([p for p in gif_dir.iterdir() if p.suffix.lower() in ('.gif',)], key=lambda p: p.name)
+    
+    
+    gif_files = [p for p in gif_dir.iterdir() if p.suffix.lower() == ".gif"]
+    gif_files.sort(key=lambda p: extract_episode_number(p.name))
+
+
     if not gif_files:
         raise FileNotFoundError(f"No gif files found in '{gif_folder}'")
 
